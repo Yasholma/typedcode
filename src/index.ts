@@ -1,11 +1,5 @@
-import express, { Request, Response } from "express";
+import App from "./app.controller";
+import PostController from "./controllers/post.controller";
 
-const app: express.Application = express();
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World");
-});
-
-app.listen(5000, () => {
-  console.log("listening on port: 5000");
-});
+const app = new App([new PostController()], 5000);
+app.listen();
