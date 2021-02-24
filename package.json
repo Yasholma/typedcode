@@ -11,7 +11,12 @@
   "author": "Yahaya Yohanna",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "@types/config": "^0.0.38",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.1",
+    "config": "^3.3.3",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.18"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",

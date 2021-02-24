@@ -1,3 +1,5 @@
+import error from "./error";
 import logger from "./logger";
+import validateInputs from "./validation";
 
-export { logger };
+export { logger, error, validateInputs };
