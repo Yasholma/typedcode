@@ -1,11 +1,6 @@
-import { Document, Model, model, Schema } from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import CreatePostDto from "../dtos/create-post.dto";
-
-export interface IPost {
-  author: string;
-  title: string;
-  content: string;
-}
+import { IPost } from "./post.interface";
 
 export type PostDocument = Document & IPost;
 
@@ -19,30 +14,33 @@ const postSchema = new Schema({
 });
 
 class Post {
-  private postModel: Model<Document<PostDocument>> = model("Post", postSchema);
+  private postModel = model<PostDocument>("Post", postSchema);
 
-  async getPosts() {
+  async getPosts(): Promise<PostDocument[]> {
     const posts = await this.postModel.find();
     return posts;
   }
 
-  async getPostById(id: string) {
+  async getPostById(id: string): Promise<PostDocument> {
     return this.postModel.findById(id);
   }
 
-  async createPost(createPostDto: CreatePostDto) {
+  async createPost(createPostDto: CreatePostDto): Promise<PostDocument> {
     const { title, content, author } = createPostDto;
     return this.postModel.create({ title, content, author });
   }
 
-  async updatePost(id: any, updatePostDto: any) {
+  async updatePost(
+    id: any,
+    updatePostDto: CreatePostDto
+  ): Promise<PostDocument> {
     return this.postModel.findOneAndUpdate({ _id: id }, updatePostDto, {
       new: true,
       useFindAndModify: false,
     });
   }
 
-  async deletePost(id: any) {
+  async deletePost(id: any): Promise<PostDocument> {
     return this.postModel.findOneAndDelete({ _id: id });
   }
 }

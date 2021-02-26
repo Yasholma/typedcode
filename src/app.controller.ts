@@ -1,12 +1,8 @@
-import express, { Application, json, Router } from "express";
-import config from "config";
+import express, { Application, json } from "express";
 import mongoose from "mongoose";
+import cookerParser from "cookie-parser";
 import { error, logger } from "./middlewares";
-
-interface IController {
-  path: string;
-  router: Router;
-}
+import { IController } from "./controllers/controller.interface";
 
 class App {
   public app: Application;
@@ -31,6 +27,7 @@ class App {
   private initilizeMiddlewares() {
     this.app.use(json());
     this.app.use(logger);
+    this.app.use(cookerParser());
   }
 
   private initializeErrorMiddleware() {
@@ -44,8 +41,9 @@ class App {
   }
 
   private async connectToDatabase() {
+    const dbURL: string = process.env.DATABASE_URL;
     try {
-      await mongoose.connect(config.get("dbConfig.url"), {
+      await mongoose.connect(dbURL, {
         useCreateIndex: true,
         useUnifiedTopology: true,
         useNewUrlParser: true,

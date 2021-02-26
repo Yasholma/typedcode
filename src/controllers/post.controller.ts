@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { validateInputs } from "../middlewares";
+import { auth, validateInputs } from "../middlewares";
 import CreatePostDto from "../dtos/create-post.dto";
 import PostNotFoundException from "../exceptions/PostNotFoundException";
 import Post from "../models/post.model";
+import { IController } from "./controller.interface";
+import IRequestWithUser from "../models/request-with-user.interdace";
 
-class PostController {
+class PostController implements IController {
   public router: Router = Router();
   public path: string = "/posts";
   private postModel: Post;
@@ -17,13 +19,15 @@ class PostController {
   private initializeRoutes(): void {
     this.router.get(this.path, this.getPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router.post(this.path, validateInputs(CreatePostDto), this.createPost);
-    this.router.patch(
-      `${this.path}/:id`,
-      validateInputs(CreatePostDto, true),
-      this.updatePost
-    );
-    this.router.delete(`${this.path}/:id`, this.deletePost);
+    this.router
+      .all(`${this.path}/*`, auth)
+      .patch(
+        `${this.path}/:id`,
+        validateInputs(CreatePostDto, true),
+        this.updatePost
+      )
+      .delete(`${this.path}/:id`, this.deletePost)
+      .post(this.path, auth, validateInputs(CreatePostDto), this.createPost);
   }
 
   private getPosts = async (req: Request, res: Response): Promise<void> => {
@@ -55,10 +59,17 @@ class PostController {
     }
   };
 
-  private createPost = async (req: Request, res: Response): Promise<void> => {
+  private createPost = async (
+    req: IRequestWithUser,
+    res: Response
+  ): Promise<void> => {
     const createPostDto: CreatePostDto = req.body;
     try {
-      const post = await this.postModel.createPost(createPostDto);
+      const toSave = {
+        ...createPostDto,
+        author: req.user._id,
+      };
+      const post = await this.postModel.createPost(toSave);
       res.status(201).send(post);
     } catch (error) {
       res.status(500).send("Creating post failed.");
