@@ -1,8 +1,8 @@
 import { NextFunction, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import User from "../models/user.model";
-import { IDataStoredInToken } from "../models/token-data.interface";
-import IRequestWithUser from "../models/request-with-user.interdace";
+import User from "../models/user/user.model";
+import { IDataStoredInToken } from "../models/user/token-data.interface";
+import IRequestWithUser from "../models/user/request-with-user.interface";
 import WrongAuthenticationTokenException from "../exceptions/WrongAuthenticationTokenException";
 import AuthenticationTokenMissingException from "../exceptions/AuthenticationTokenMissingException";
 

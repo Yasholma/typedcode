@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { validateInputs } from "../middlewares";
-import User from "../models/user.model";
+import User from "../models/user/user.model";
 import CreateUserDto from "../dtos/create-user.dto";
 import { IController } from "./controller.interface";
 import UserWithThatEmailAlreadyExistException from "../exceptions/UserWithThatEmailAlreadyExistException";
 import bcrypt from "bcrypt";
 import LoginDto from "../dtos/login.dto";
 import WrongCredentialsException from "../exceptions/WrongCredentialsException";
-import { ITokenData } from "../models/token-data.interface";
+import { ITokenData } from "../models/user/token-data.interface";
 
 class AuthenticationController implements IController {
   public path: string = "/auth";
@@ -42,7 +42,7 @@ class AuthenticationController implements IController {
     res: Response,
     next: NextFunction
   ) => {
-    const { name, email, password }: CreateUserDto = req.body;
+    const { name, email, password, address }: CreateUserDto = req.body;
 
     try {
       // check if user with this email already exist
@@ -57,6 +57,7 @@ class AuthenticationController implements IController {
         name,
         email,
         password: hashedPassword,
+        address,
       });
 
       // delete password

@@ -1,5 +1,10 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
+class Address {
+  city: string;
+  state: string;
+}
+
 class CreateUserDto {
   @IsNotEmpty()
   @IsString()
@@ -12,6 +17,8 @@ class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  address: Address;
 }
 
 export default CreateUserDto;

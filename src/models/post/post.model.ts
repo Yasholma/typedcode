@@ -1,28 +1,21 @@
-import { Document, model, Schema } from "mongoose";
-import CreatePostDto from "../dtos/create-post.dto";
+import { Document, model } from "mongoose";
+import { POST } from "../../constants";
+import CreatePostDto from "../../dtos/create-post.dto";
 import { IPost } from "./post.interface";
+import { postSchema } from "./post.schema";
 
 export type PostDocument = Document & IPost;
 
-const postSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  content: { type: String, required: true },
-  author: { type: String, required: true },
-});
-
 class Post {
-  private postModel = model<PostDocument>("Post", postSchema);
+  private postModel = model<PostDocument>(POST, postSchema);
 
   async getPosts(): Promise<PostDocument[]> {
-    const posts = await this.postModel.find();
+    const posts = await this.postModel.find().populate("author", "-password");
     return posts;
   }
 
   async getPostById(id: string): Promise<PostDocument> {
-    return this.postModel.findById(id);
+    return this.postModel.findById(id).populate("author", "-password");
   }
 
   async createPost(createPostDto: CreatePostDto): Promise<PostDocument> {

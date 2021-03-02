@@ -2,9 +2,9 @@ import { NextFunction, Request, Response, Router } from "express";
 import { auth, validateInputs } from "../middlewares";
 import CreatePostDto from "../dtos/create-post.dto";
 import PostNotFoundException from "../exceptions/PostNotFoundException";
-import Post from "../models/post.model";
+import Post from "../models/post/post.model";
 import { IController } from "./controller.interface";
-import IRequestWithUser from "../models/request-with-user.interdace";
+import IRequestWithUser from "../models/user/request-with-user.interface";
 
 class PostController implements IController {
   public router: Router = Router();
@@ -70,6 +70,7 @@ class PostController implements IController {
         author: req.user._id,
       };
       const post = await this.postModel.createPost(toSave);
+      await post.populate("author", "-password").execPopulate();
       res.status(201).send(post);
     } catch (error) {
       res.status(500).send("Creating post failed.");
@@ -86,7 +87,7 @@ class PostController implements IController {
 
     try {
       const post = await this.postModel.updatePost(postId, updateData);
-
+      await post.populate("author").execPopulate();
       if (post) {
         res.send(post);
       } else {

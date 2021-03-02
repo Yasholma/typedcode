@@ -1,33 +1,18 @@
-import { Document, model, Schema } from "mongoose";
-import CreateUserDto from "../dtos/create-user.dto";
+import { Document, model } from "mongoose";
+import CreateUserDto from "../../dtos/create-user.dto";
 import { IUser } from "./user.interface";
 import { IDataStoredInToken, ITokenData } from "./token-data.interface";
 import * as jwt from "jsonwebtoken";
+import { userSchema } from "./user.schema";
+import { POST, USER } from "../../constants";
+import { PostDocument } from "../post/post.model";
+import { postSchema } from "../post/post.schema";
 
 type UserDocument = IUser & Document;
 
-const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-});
-
 class User {
-  private userModel = model<UserDocument>("User", userSchema);
+  private userModel = model<UserDocument>(USER, userSchema);
+  private postModel = model<PostDocument>(POST, postSchema);
 
   async findById(id: string): Promise<UserDocument> {
     return this.userModel.findById(id);
@@ -39,6 +24,10 @@ class User {
 
   async create(user: CreateUserDto): Promise<UserDocument> {
     return this.userModel.create(user);
+  }
+
+  async getAllUserPosts(user: IUser): Promise<PostDocument[]> {
+    return this.postModel.find({ author: user._id });
   }
 
   createToken(user: IUser): ITokenData {
